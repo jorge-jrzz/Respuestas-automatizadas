@@ -9,7 +9,6 @@ dir_actual = os.getcwd()
 # Ruta del archivo que se quiere abrir (relativa al directorio actual)
 ruta_txt = os.path.join(dir_actual, 'opciones.txt')
 
-print("\n\tCHAT PARA DAR INFORMES A LOS POSIBLES ARRENDATARIOS\n")
 def cambio_sexo():
     print("[M = Hombre | W = Mujer] \n")
     sexo = input("Opcion:   ")
@@ -87,12 +86,6 @@ def moveto():
     pyautogui.moveTo(600, 1020)
     pyautogui.click()
 
-# def bomba():
-#     for i in range(3, -1, -1):
-#         print(i, end='\r')
-#         time.sleep(1)
-#     print("\n¡Listo!")
-
 pyautogui.moveTo(1375, 12)
 pyautogui.click()
 pyautogui.moveTo(1375, 55)
@@ -101,13 +94,15 @@ pyautogui.moveTo(1370, 570)
 pyautogui.click()
 
 while True:
-    with open('opciones.txt', 'r') as file:
+    os.system("cls" if os.name == "nt" else "clear")
+
+    with open(ruta_txt, 'r') as file:
         file.seek(424)
         genero = file.read()
 
+    print("\n\tCHAT PARA DAR INFORMES A LOS POSIBLES ARRENDATARIOS\n")
     print("\n0-Cambiar de sexo -> "+"["+genero+"]"+"\n1-direccion \n2-requisitos \n3-visita \n4-numero\n5-animales\n6-EXIT")
     chose = input("Opcion:   ")
-    os.system("cls" if os.name == "nt" else "clear")
     if chose == '0':
         cambio_sexo()
     elif chose == '1':
