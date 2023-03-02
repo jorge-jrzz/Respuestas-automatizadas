@@ -1,4 +1,4 @@
-# **Bot para respuestas programadas**
+# **Chat Bot para respuestas programadas**
 
 Este es un chat bot que se realizó con python para automatizar de cierta forma las conversaciones con personas interesadas en rentar un inmueble habitacional en la CDMX.
 
