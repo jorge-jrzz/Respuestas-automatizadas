@@ -19,12 +19,12 @@ def cambio_sexo():
 # Escribir los datos en la posición actual del puntero
         file.write("a.")
 # Cambiar la que me va a estar indicando para que genero va dirigido el mensaje
-        file.seek(424)
+        file.seek(387)
         file.write("W")
     elif sexo == "M" or sexo == "m":
         file.seek(19)
         file.write("o.")
-        file.seek(424)
+        file.seek(387)
         file.write("M")
     file.close()
 
@@ -43,7 +43,7 @@ def direccion():
 
 def requisitos():
     with open('opciones.txt', 'r') as file:
-        file.seek(184)
+        file.seek(147)
         opcion = file.readline()
         pyperclip.copy(opcion)
 
@@ -53,7 +53,7 @@ def requisitos():
 
 def visita():
     with open('opciones.txt', 'r') as file:
-        file.seek(258)
+        file.seek(221)
         opcion = file.readline()
         pyperclip.copy(opcion)
                 
@@ -63,7 +63,7 @@ def visita():
 
 def numero():
     with open('opciones.txt', 'r') as file:
-        file.seek(341)
+        file.seek(304)
         opcion = file.readline()
         pyperclip.copy(opcion)
                 
@@ -73,7 +73,7 @@ def numero():
 
 def animales():
     with open('opciones.txt', 'r') as file:
-        file.seek(384)
+        file.seek(346)
         opcion = file.readline()
         pyperclip.copy(opcion)
     
@@ -97,7 +97,7 @@ while True:
     os.system("cls" if os.name == "nt" else "clear")
 
     with open(ruta_txt, 'r') as file:
-        file.seek(424)
+        file.seek(387)
         genero = file.read()
 
     print("\n\tCHAT PARA DAR INFORMES A LOS POSIBLES ARRENDATARIOS\n")
