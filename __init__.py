@@ -31,7 +31,7 @@ def get_response(message):
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": f"Eres un vendedor de viene raices, no des respuestas tan largas y la siguiente es informacion del inmueble que vas a vender: {extra_body}"},
+            {"role": "system", "content": f"Eres un vendedor de viene raices muy amables, no des respuestas tan largas y la siguiente es informacion del inmueble que vas a vender: {extra_body}"},
             {
                 "role": "user",
                 "content": message
@@ -73,6 +73,7 @@ def home():
 def webhook_whatsapp():
     # Token de acceso de Meta
     global token_meta
+
     # Identificador de número de teléfono
     global id_phone
 
@@ -101,7 +102,7 @@ def webhook_whatsapp():
 
     if message is not None:
 
-        open_renponse = get_response(message.text)
+        open_renponse = get_response(message)
         send_message(phone_number, open_renponse, token_meta, id_phone)
 
         # Retornamos el status de la respuesta
