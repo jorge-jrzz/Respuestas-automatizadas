@@ -1,129 +1,112 @@
-import pyperclip
-import pyautogui
-import time
+from flask import Flask, render_template, jsonify, request
+from heyoo import WhatsApp
+from openai import OpenAI
+from dotenv import load_dotenv
 import os
 
 
 # Ruta del directorio actual
 dir_actual = os.getcwd()
+
 # Ruta del archivo que se quiere abrir (relativa al directorio actual)
-ruta_txt = os.path.join(dir_actual, 'opciones.txt')
+ruta_txt = os.path.join(dir_actual, 'data.txt')
 
-def cambio_sexo():
-    print("[M = Hombre | W = Mujer] \n")
-    sexo = input("Opcion:   ")
-    file = open(ruta_txt, "r+")
-    if sexo == "W" or sexo == "w":
-# Mover el puntero de escritura a la posición 10 (cuenta letras y espacios)
-        file.seek(19)
-# Escribir los datos en la posición actual del puntero
-        file.write("a.")
-# Cambiar la que me va a estar indicando para que genero va dirigido el mensaje
-        file.seek(387)
-        file.write("W")
-    elif sexo == "M" or sexo == "m":
-        file.seek(19)
-        file.write("o.")
-        file.seek(387)
-        file.write("M")
-    file.close()
+# Cargamos las variables de entorno
+load_dotenv()
 
-def direccion():
-    with open('opciones.txt', 'r') as file:
-        row1 = file.readline()
-        row2 = file.readline()
-        row3 = file.readline()
-        opcion = row1 + row2 +row3
-        pyperclip.copy(opcion)
-# Obtener el texto del portapapeles
-    text = pyperclip.paste()
-    time.sleep(2)
-# Escribir el texto en la posición actual del cursor
-    pyautogui.typewrite(text)
+port = int(os.getenv("PORT")) or 5000
+api_key = os.getenv("API_KEY")
+token_meta = os.getenv("TOKEN_META")
+id_phone = os.getenv("ID_PHONE")
+organization = os.getenv("ORGANIZATION")
 
-def requisitos():
-    with open('opciones.txt', 'r') as file:
-        file.seek(147)
-        opcion = file.readline()
-        pyperclip.copy(opcion)
+with open(ruta_txt, "r", encoding="utf-8") as f:
+    extra_body = f.read()
 
-    text = pyperclip.paste()
-    time.sleep(2)
-    pyautogui.typewrite(text)
+# Conexcion a la API de OpenAI
+client = OpenAI(api_key=api_key, organization=organization)
 
-def visita():
-    with open('opciones.txt', 'r') as file:
-        file.seek(221)
-        opcion = file.readline()
-        pyperclip.copy(opcion)
-                
-    text = pyperclip.paste()
-    time.sleep(2)
-    pyautogui.typewrite(text)
 
-def numero():
-    with open('opciones.txt', 'r') as file:
-        file.seek(304)
-        opcion = file.readline()
-        pyperclip.copy(opcion)
-                
-    text = pyperclip.paste()
-    time.sleep(2)
-    pyautogui.typewrite(text)
+def get_response(message):
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": f"Eres un vendedor de viene raices, no des respuestas tan largas y la siguiente es informacion del inmueble que vas a vender: {extra_body}"},
+            {
+                "role": "user",
+                "content": message
+            }
+        ],
+        temperature=0.2,
+        max_tokens=1024,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
 
-def animales():
-    with open('opciones.txt', 'r') as file:
-        file.seek(346)
-        opcion = file.readline()
-        pyperclip.copy(opcion)
-    
-    text = pyperclip.paste()
-    time.sleep(2)
-    pyautogui.typewrite(text)
+    return response.choices[0].message.content
 
-def moveto():
-    print("Mandando el mensaje al posible inquilino...")
-    pyautogui.moveTo(600, 1020)
-    pyautogui.click()
 
-pyautogui.moveTo(1375, 12)
-pyautogui.click()
-pyautogui.moveTo(1375, 55)
-pyautogui.click()
-pyautogui.moveTo(1370, 570)
-pyautogui.click()
+def send_message(phone_receive, answer, token_meta, id_phone):
+    # Token de acceso de Meta
+    # global token_meta
+    # # Identificador de número de teléfono
+    # global id_phone
 
-while True:
-    os.system("cls" if os.name == "nt" else "clear")
+    # Init WhatsApp
+    menssage_Whats = WhatsApp(token_meta, id_phone)
+    phone_receive = phone_receive.replace("521", "52")
 
-    with open(ruta_txt, 'r') as file:
-        file.seek(387)
-        genero = file.read()
+    # Enviamos el mensaje
+    menssage_Whats.send_message(answer, phone_receive)
 
-    print("\n\tCHAT PARA DAR INFORMES A LOS POSIBLES ARRENDATARIOS\n")
-    print("\n0-Cambiar de sexo -> "+"["+genero+"]"+"\n1-direccion \n2-requisitos \n3-visita \n4-numero\n5-animales\n6-EXIT")
-    chose = input("Opcion:   ")
-    if chose == '0':
-        cambio_sexo()
-    elif chose == '1':
-        moveto()
-        direccion()
-    elif chose == '2':
-        moveto()
-        requisitos()
-    elif chose == '3':
-        moveto()
-        visita()
-    elif chose == '4':
-        moveto()
-        numero()
-    elif chose == '5':
-        moveto()
-        animales()
-    elif chose == '6':
-        pyautogui.moveTo(1375, 12)
-        pyautogui.click()
-        pyautogui.moveTo(1375, 40)
-        pyautogui.click()
-        break
-    else: print("\nOPCION INVALIDA\n")
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
+@app.route("/webhook/", methods=["POST", "GET"])
+def webhook_whatsapp():
+    # Token de acceso de Meta
+    global token_meta
+    # Identificador de número de teléfono
+    global id_phone
+
+    if request.method == "GET":
+
+        # Verificacion de token
+        if request.args.get('hub.verify_token') == "stdyws":
+            return request.args.get('hub.challenge')
+        else:
+            return "Error de autentificacion."
+
+    # Recibimos los datos de la API de Facebook
+    data = request.get_json()
+
+    # Telefono del cliente
+    phone_number = data['entry'][0]['changes'][0]['value']['messages'][0]['from']
+
+    # Mensaje del cliente
+    message = data['entry'][0]['changes'][0]['value']['messages'][0]['text']['body']
+
+    # id del mensaje
+    # idWA = data['entry'][0]['changes'][0]['value']['messages'][0]['id']
+
+    # Imformacion de la fecha y hora del mensaje
+    # timestamp = data['entry'][0]['changes'][0]['value']['messages'][0]['timestamp']
+
+    if message is not None:
+
+        open_renponse = get_response(message.text)
+        send_message(phone_number, open_renponse, token_meta, id_phone)
+
+        # Retornamos el status de la respuesta
+        return jsonify({"status": "success"}, 200)
+
+
+if __name__ == "__main__":
+    app.run(port=port, debug=False)
