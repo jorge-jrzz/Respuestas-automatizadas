@@ -80,7 +80,7 @@ def webhook_whatsapp():
     if request.method == "GET":
 
         # Verificacion de token
-        if request.args.get('hub.verify_token') == "stdyws":
+        if request.args.get('hub.verify_token') == "wsrenta":
             return request.args.get('hub.challenge')
         else:
             return "Error de autentificacion."
