@@ -47,14 +47,14 @@ def get_response(message):
     return response.choices[0].message.content
 
 
-def send_message(phone_receive, answer, token_meta, id_phone):
+def send_message(phone_receive, answer, meta_acceso, phone_id):
     # Token de acceso de Meta
     # global token_meta
     # # Identificador de número de teléfono
     # global id_phone
 
     # Init WhatsApp
-    menssage_Whats = WhatsApp(token_meta, id_phone)
+    menssage_Whats = WhatsApp(meta_acceso, phone_id)
     phone_receive = phone_receive.replace("521", "52")
 
     # Enviamos el mensaje
